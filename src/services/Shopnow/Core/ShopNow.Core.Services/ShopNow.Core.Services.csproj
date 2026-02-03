@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../ShopNow.Core.Contracts/ShopNow.Core.Contracts.csproj" />
+    <ProjectReference Include="../ShopNow.Core.Persistence/ShopNow.Core.Persistence.csproj" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.0" />
   </ItemGroup>
 

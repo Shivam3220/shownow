@@ -10,5 +10,11 @@ namespace ShopNow.Core.Persistence.Common.Entities
         public decimal SubTotal { get; set; }
         public string Coupon { get; set; }
         public decimal Discount { get; set; }
+
+        public void ApplyCoupon(string couponName, decimal discountAmount)
+        {
+            Coupon = couponName;
+            Discount = discountAmount;
+        }
     }
 }

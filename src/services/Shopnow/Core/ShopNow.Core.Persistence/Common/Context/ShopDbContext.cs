@@ -44,6 +44,7 @@ namespace ShopNow.Core.Persistence.Common.Context
                 }
                 catch (Exception ex)
                 {
+                    Console.Write(ex);
                     await transaction.RollbackAsync();
                     return Result.Failure("FAILED_TO_PROCESS_REQUEST");
                 }
