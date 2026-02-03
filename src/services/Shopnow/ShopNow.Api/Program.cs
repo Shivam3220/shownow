@@ -39,6 +39,7 @@ public class Program
 
     private static void RunApplication(WebApplication app)
     {
+        MigrationManager.MigrateDatabase(app.Services);
         app
             .UseRouting()
             .UseSwagger()

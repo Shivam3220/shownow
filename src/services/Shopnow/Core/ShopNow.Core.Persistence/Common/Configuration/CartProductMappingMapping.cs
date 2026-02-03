@@ -7,7 +7,7 @@ namespace ShopNow.Core.Persistence.Common.Configuration
     {
         public void Configure(EntityTypeBuilder<Entities.CartProductMapping> builder)
         {
-            builder.ToTable("OrderProductMapping", "Shopnow");
+            builder.ToTable("CartProductMapping", "Shopnow");
 
             builder.HasKey(x => x.Id);
 

@@ -16,6 +16,7 @@ namespace ShopNow.Api.Registers
                         options.UseSqlServer(settings.ConnectionString,
                         sqlServerOptionsAction: sqlOptions =>
                         {
+                            sqlOptions.MigrationsAssembly("ShopNow.Core.Persistence");
                             sqlOptions.EnableRetryOnFailure(
                             maxRetryCount: 5,
                             maxRetryDelay: TimeSpan.FromSeconds(15),

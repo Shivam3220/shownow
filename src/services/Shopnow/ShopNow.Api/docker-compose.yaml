@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  shopnow-sql-service:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: shopnow-sql-container
+    environment:
+      SA_PASSWORD: "${MYSQL_PASSWORD}"
+      ACCEPT_EULA: "Y"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${MYSQL_PASSWORD} -Q \"SELECT 1\""]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    ports:
+      - "1433:1433"
+    volumes:
+      - shopnow-sql-data:/var/opt/
+    networks:
+      - shopnow-networks
+  
+  shopnow-redis-service:
+    container_name: shopnow-redis-container
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        interval: 10s
+        timeout: 5s
+        retries: 3
+        start_period: 30s
+    ports:
+      - "6379:6379"
+      - "6380:6380"
+
+  shopnow-redis-insight-service:
+    container_name: shopnow-redis-insight-container
+    image: redis/redisinsight:latest
+    restart: unless-stopped
+    ports:
+      - "5540:5540"
+    depends_on:
+      - shopnow-redis-service
+
+volumes:
+  shopnow-sql-data:
+
+networks:
+  shopnow-networks:
