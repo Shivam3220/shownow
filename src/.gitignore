@@ -1,0 +1,15 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+
+# .NET / NuGet
+project.lock.json
+artifacts/
+
+# NuGet packages
+*.nupkg
+**/packages/*
