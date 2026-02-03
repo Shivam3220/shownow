@@ -1,0 +1,13 @@
+{
+	"dotnet.defaultSolution": "ShopNow.sln",
+	"files.watcherExclude": {
+		"**/node_modules/**": true,
+		"**/bin/**": true,
+		"**/obj/**": true
+	},
+	"files.exclude": {
+		"**/node_modules": true,
+		"**/bin/**": true,
+		"**/obj/**": true
+	}
+}
