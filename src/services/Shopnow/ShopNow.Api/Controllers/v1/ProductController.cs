@@ -7,7 +7,7 @@ using ShopNow.Core.Services.Products;
 namespace ShopNow.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class ProductController : BaseController
     {
         private readonly IProductService _productRepository;

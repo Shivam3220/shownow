@@ -17,6 +17,8 @@ namespace ShopNow.Core.Persistence.Common.Configuration
             builder.Property(x => x.Email).HasColumnName("Email").HasColumnType("nvarchar(100)").IsRequired();
             builder.Property(x => x.Password).HasColumnName("Password").HasColumnType("nvarchar(500)").IsRequired();
             builder.Property(x => x.CreatedOn).HasColumnName("CreatedOn").HasColumnType("datetime2").IsRequired();
+
+            builder.HasIndex(x => x.Email).IsUnique();
         }
     }
 }
