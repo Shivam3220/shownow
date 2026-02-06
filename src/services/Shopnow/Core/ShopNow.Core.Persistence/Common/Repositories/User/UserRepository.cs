@@ -31,5 +31,25 @@ namespace ShopNow.Core.Persistence.Common.Repositories.Users
                 return Result.Failure<User>("Failed to process request at this moment");
             }
         }
+
+        public async Task<Result<User>> GetByUserIdAsyncAsync(Guid userId)
+        {
+            try
+            {
+                var user = await shopDbContext.Set<User>().Where(x => x.Uid == userId).FirstOrDefaultAsync();
+    
+                if(user is null)
+                {
+                    return Result.NotFound<User>("User not found");
+                }
+    
+                return Result.Ok(user);
+            }
+            catch (Exception e)
+            {
+                Console.Write(e);
+                return Result.Failure<User>("Failed to process request at this moment");
+            }
+        }
     }
 }

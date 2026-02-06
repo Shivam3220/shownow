@@ -13,12 +13,6 @@ namespace ShopNow.Api.Registers
         {
             services.AddSingleton<ICacheSettings, CacheSettings>();
 
-
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IUserRepository, UserRepository>();
-
-            services.AddScoped<IUserService, UserService>();
-
             return services;
         }
     }
