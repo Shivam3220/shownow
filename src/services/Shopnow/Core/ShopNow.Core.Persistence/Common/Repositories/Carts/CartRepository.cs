@@ -15,16 +15,24 @@ namespace ShopNow.Core.Persistence.Common.Repositories.Carts
 
         public async Task<Result<Cart>> GetCartByIdAsync(Guid productId)
         {
-            Cart? cart = await shopDbContext.Set<Cart>()
-                                            .AsNoTracking()
-                                            .Where(x => x.Uid == productId)
-                                            .FirstOrDefaultAsync();
-            if (cart is null)
+            try
             {
-                return Result.NotFound<Cart>("Cart not found");
+                Cart? cart = await shopDbContext.Set<Cart>()
+                                                .AsNoTracking()
+                                                .Where(x => x.Uid == productId)
+                                                .FirstOrDefaultAsync();
+                if (cart is null)
+                {
+                    return Result.NotFound<Cart>("Cart not found");
+                }
+    
+                return Result.Ok(cart);
             }
-
-            return Result.Ok(cart);
+            catch (System.Exception ex)
+            {
+                 Console.Write(ex);
+                return Result.Failure<Cart>("Failed to process request at this moment");
+            }
         }
 
         public async Task<Result<Cart>> GetCartByUserIdAsync(Guid userId)
@@ -50,11 +58,9 @@ namespace ShopNow.Core.Persistence.Common.Repositories.Carts
             }
         }
 
-        public async Task<Result<bool>> UpdateCartById(Cart cart)
+        public void UpdateCart(Cart cart)
         {
             shopDbContext.Set<Cart>().Update(cart);
-            await shopDbContext.SaveChangesAsync();
-            return Result.Ok(true);
         }
     }
 }

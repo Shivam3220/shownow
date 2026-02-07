@@ -14,14 +14,14 @@ namespace ShopNow.Core.Services.Carts
             { "SAVE10", 10 },
         };
 
-        public async Task<Result<bool>> ApplyCoupon(Guid productId)
+        public async Task<Result<Cart>> ApplyCoupon(Guid cartUid)
         {
             try
             {
-                Result<Cart> cart = await cartRepository.GetCartByIdAsync(productId);
+                Result<Cart> cart = await cartRepository.GetCartByIdAsync(cartUid);
                 if (cart.IsFailure)
                 {
-                    return Result.FromError<bool>(cart);
+                    return Result.FromError<Cart>(cart);
                 }
 
                 if (cart.Value.SubTotal > 1000)
@@ -40,12 +40,19 @@ namespace ShopNow.Core.Services.Carts
                 {
                     cart.Value.ApplyCoupon("FLAT50", 50);
                 }
+                cartRepository.UpdateCart(cart.Value);
+                Result result = await unitOfWork.SaveChangeAsync();
 
-                return Result.Ok(true);
+                if (result.IsFailure)
+                {
+                    return Result.FromError<Cart>(result);
+                }
+
+                return Result.Ok(cart.Value);
             }
             catch
             {
-                return Result.Failure<bool>("Failed To Process request");
+                return Result.Failure<Cart>("Failed To Process request");
             }
         }
 
@@ -60,16 +67,16 @@ namespace ShopNow.Core.Services.Carts
 
             Result<Cart> existingCart = await GetCartByUserIdAsync(userId);
 
-            if(existingCart.IsFailure && !existingCart.IsNotFound)
+            if (existingCart.IsFailure && !existingCart.IsNotFound)
             {
                 return existingCart;
             }
 
-            if(existingCart.IsSuccess)
+            if (existingCart.IsSuccess)
             {
                 return Result.Conflict<Cart>("User already have a active cart");
             }
-            
+
             Cart newCart = Cart.CreateNew(userFk: userId);
             cartRepository.CreateNew(newCart);
             Result result = await unitOfWork.SaveChangeAsync();
@@ -82,17 +89,10 @@ namespace ShopNow.Core.Services.Carts
             return Result.Ok(newCart);
         }
 
-        public async Task<Result<Cart>> GetCartByIdAsync(Guid productId)
+        public async Task<Result<Cart>> GetCartByIdAsync(Guid cartId)
         {
-            try
-            {
-                return await cartRepository.GetCartByIdAsync(productId);
+            return await cartRepository.GetCartByIdAsync(cartId);
 
-            }
-            catch
-            {
-                return Result.Failure<Cart>("Failed To Process request");
-            }
         }
 
         public async Task<Result<Cart>> GetCartByUserIdAsync(Guid userId)

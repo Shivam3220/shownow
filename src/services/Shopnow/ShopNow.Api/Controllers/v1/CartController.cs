@@ -31,5 +31,15 @@ namespace ShopNow.Api.Controllers
             return OkOrError(cart);
         }
 
+
+        [HttpGet("cart/{cartId}/apply-coupon")]
+        public async Task<IActionResult> GetCartByUidAsync(Guid cartId)
+        {
+
+            Result<Cart> cart = await cartService.ApplyCoupon(cartUid: cartId);
+
+            return OkOrError(cart);
+        }
+
     }
 }

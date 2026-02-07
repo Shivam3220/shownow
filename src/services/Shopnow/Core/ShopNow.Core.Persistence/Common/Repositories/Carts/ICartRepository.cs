@@ -7,7 +7,7 @@ namespace ShopNow.Core.Persistence.Common.Repositories.Carts
     {
         Task<Result<Cart>> GetCartByIdAsync(Guid productId);
         Task<Result<Cart>> GetCartByUserIdAsync(Guid userId);
-        Task<Result<bool>> UpdateCartById(Cart cart);
+        void UpdateCart(Cart cart);
         void CreateNew(Cart cart);
     }
 }
