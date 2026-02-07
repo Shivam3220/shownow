@@ -1,12 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ShopNow.Core.Contracts.Dtos.Carts;
-using ShopNow.Core.Contracts.Dtos.Users;
 using ShopNow.Core.Contracts.Results;
-using ShopNow.Core.Persistence.Common.Entities;
-using ShopNow.Core.Persistence.Common.Repositories.Products;
 using ShopNow.Core.Services.Carts;
-using ShopNow.Core.Services.Products;
-using ShopNow.Core.Services.Users;
 
 namespace ShopNow.Api.Controllers
 {
@@ -38,6 +33,15 @@ namespace ShopNow.Api.Controllers
         {
 
             Result<CartDto> cart = await cartService.ApplyCoupon(cartUid: cartId);
+
+            return OkOrError(cart);
+        }
+
+        [HttpPost("{userId}/checkout")]
+        public async Task<IActionResult> CheckoutCartAsync(Guid userId)
+        {
+
+            Result<Guid> cart = await cartService.CheckoutAsync(userId);
 
             return OkOrError(cart);
         }

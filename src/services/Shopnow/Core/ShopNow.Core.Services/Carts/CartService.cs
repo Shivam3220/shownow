@@ -1,5 +1,8 @@
+using System.Data;
+using Microsoft.EntityFrameworkCore;
 using ShopNow.Core.Contracts.Dtos.Carts;
 using ShopNow.Core.Contracts.Results;
+using ShopNow.Core.Persistence.Common.Context;
 using ShopNow.Core.Persistence.Common.Entities;
 using ShopNow.Core.Persistence.Common.Repositories.Carts;
 using ShopNow.Core.Persistence.Common.Repositories.Products;
@@ -8,7 +11,7 @@ using ShopNow.Core.Persistence.Common.Repositories.Users;
 
 namespace ShopNow.Core.Services.Carts
 {
-    public class CartService(ICartRepository cartRepository, IProductRepository productRepository, IUnitOfWork unitOfWork, IUserRepository userRepository) : ICartService
+    public class CartService(IShopDbContext shopDbContext, ICartRepository cartRepository, IProductRepository productRepository, IUnitOfWork unitOfWork, IUserRepository userRepository) : ICartService
     {
         Dictionary<string, int> AvailableCoupon = new Dictionary<string, int>
         {
@@ -164,6 +167,69 @@ namespace ShopNow.Core.Services.Carts
 
             return Result.Ok(cart.Value.ToCartDto());
 
+        }
+
+        public async Task<Result<Guid>> CheckoutAsync(Guid userId)
+        {
+            await using var transaction =
+                await shopDbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var cart = await shopDbContext.Set<Cart>()
+                    .Where(x => x.UserFk == userId && x.Status == "ACTIVE")
+                    .Include(x => x.CartProducts)
+                        .ThenInclude(cp => cp.Product)
+                    .FirstOrDefaultAsync();
+
+                if (cart == null)
+                    return Result.Failure<Guid>("Active cart not found");
+
+                if (!cart.CartProducts.Any())
+                    return Result.Failure<Guid>("Cart is empty");
+
+                // 2️⃣ Validate stock
+                foreach (var item in cart.CartProducts)
+                {
+                    if (item.Product.Stock < item.Quantity)
+                    {
+                        return Result.Failure<Guid>(
+                            $"Insufficient stock for product {item.Product.Name}");
+                    }
+                }
+
+                // 3️⃣ Decrease product stock
+                foreach (var item in cart.CartProducts)
+                {
+                    item.Product.Stock -= item.Quantity;
+                }
+
+                // 4️⃣ Create order
+                var order = Order.CreateNew(userId, cart.CartProducts.Select(cp => new OrderProductMapping
+                    {
+                        ProductFk = cp.ProductFk,
+                        Quantity = cp.Quantity,
+                        PurchasePrice = cp.PurchasePrice,
+                    }).ToList(), cart.Discount);
+
+                shopDbContext.Set<Order>().Add(order);
+
+                // 5️⃣ Update cart status
+                cart.Status = "CHECKED_OUT";
+
+                // 6️⃣ Save all changes
+                await shopDbContext.SaveChangesAsync();
+
+                // 7️⃣ Commit transaction
+                await transaction.CommitAsync();
+
+                return Result.Ok(order.Uid);
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return Result.Failure<Guid>("Failed to process request");
+            }
         }
     }
 }

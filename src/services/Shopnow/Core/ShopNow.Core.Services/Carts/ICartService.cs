@@ -11,5 +11,6 @@ namespace ShopNow.Core.Services.Carts
         Task<Result<CartDto>> ApplyCoupon(Guid cartUid);
         Task<Result<CartDto>> CreateNewCart(Guid userId);
         Task<Result<CartDto>> UpdateCart(Guid cartId, Guid productId, int quantity);
+        Task<Result<Guid>> CheckoutAsync(Guid userId);
     }
 }

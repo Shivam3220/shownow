@@ -11,5 +11,18 @@ namespace ShopNow.Core.Persistence.Common.Entities
 
         public Order Order { get; set; }
         public Product Product { get; set; }
+
+        public static OrderProductMapping CreateNew(Guid orderId, Guid productFk, int quantity, decimal purchasePrice)
+        {
+            return new OrderProductMapping
+            {
+                Uid = Guid.NewGuid(),
+                OrderFk = orderId,
+                ProductFk = productFk,
+                Quantity = quantity,
+                PurchasePrice = purchasePrice,
+                CreatedOn = DateTime.Now
+            };
+        }
     }
 }

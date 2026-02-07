@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using ShopNow.Core.Contracts.Results;
 
 namespace ShopNow.Core.Persistence.Common.Context
@@ -39,5 +40,7 @@ namespace ShopNow.Core.Persistence.Common.Context
         /// <param name="action"></param>
         /// <returns></returns>
         Task<Result> SaveChangesAsTransactionAsync(Func<Task> action);
+
+        DatabaseFacade Database {get; }
     }
 }
