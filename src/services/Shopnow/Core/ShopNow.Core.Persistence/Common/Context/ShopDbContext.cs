@@ -6,8 +6,6 @@ namespace ShopNow.Core.Persistence.Common.Context
 {
     public class ShopDbContext : DbContext, IShopDbContext
     {
-        public DatabaseFacade Database { get => Database; }
-
         public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options)
         {
         }

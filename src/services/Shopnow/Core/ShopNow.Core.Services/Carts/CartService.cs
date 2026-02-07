@@ -129,7 +129,7 @@ namespace ShopNow.Core.Services.Carts
                 return Result.Conflict<CartDto>($"Only {product.Value.Stock} left");
             }
 
-            Result<Cart> cart = await cartRepository.GetCartByIdAsync(cartId);
+            Result<Cart> cart = await cartRepository.GetCartByIdAsync(cartId, true);
 
             if (cart.IsFailure)
             {
@@ -165,11 +165,21 @@ namespace ShopNow.Core.Services.Carts
                 return Result.FromError<CartDto>(result);
             }
 
-            return Result.Ok(cart.Value.ToCartDto());
+            Result<Cart> updateCart = await cartRepository.GetCartByIdAsync(cartId, true);
+
+            if (updateCart.IsFailure)
+            {
+                return Result.FromError<CartDto>(updateCart);
+            }
+
+            return Result.Ok(updateCart.Value.ToCartDto());
 
         }
 
         public async Task<Result<Guid>> CheckoutAsync(Guid userId)
+        {
+            var strategy = shopDbContext.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync(async () =>
         {
             await using var transaction =
                 await shopDbContext.Database.BeginTransactionAsync();
@@ -206,11 +216,11 @@ namespace ShopNow.Core.Services.Carts
 
                 // 4️⃣ Create order
                 var order = Order.CreateNew(userId, cart.CartProducts.Select(cp => new OrderProductMapping
-                    {
-                        ProductFk = cp.ProductFk,
-                        Quantity = cp.Quantity,
-                        PurchasePrice = cp.PurchasePrice,
-                    }).ToList(), cart.Discount);
+                {
+                    ProductFk = cp.ProductFk,
+                    Quantity = cp.Quantity,
+                    PurchasePrice = cp.PurchasePrice,
+                }).ToList(), cart.Discount);
 
                 shopDbContext.Set<Order>().Add(order);
 
@@ -225,11 +235,12 @@ namespace ShopNow.Core.Services.Carts
 
                 return Result.Ok(order.Uid);
             }
-            catch
+            catch (Exception e)
             {
                 await transaction.RollbackAsync();
                 return Result.Failure<Guid>("Failed to process request");
             }
+        });
         }
     }
 }

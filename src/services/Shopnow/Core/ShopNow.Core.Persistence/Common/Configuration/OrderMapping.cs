@@ -15,7 +15,7 @@ namespace ShopNow.Core.Persistence.Common.Configuration
             builder.Property(x => x.Uid).HasColumnName("Uid").HasColumnType("uniqueidentifier").IsRequired();
             builder.Property(x => x.UserFk).HasColumnName("UserFk").HasColumnType("uniqueidentifier").IsRequired();
             builder.Property(x => x.Status).HasColumnName("Status").HasColumnType("nvarchar(50)").IsRequired();
-            builder.Property(x => x.Coupon).HasColumnName("Coupon").HasColumnType("nvarchar(50)");
+            builder.Property(x => x.Coupon).HasColumnName("Coupon").HasColumnType("nvarchar(50)").IsRequired(false);
             builder.Property(x => x.SubTotal).HasColumnName("SubTotal").HasColumnType("decimal(18,2)").IsRequired();
             builder.Property(x => x.Discount).HasColumnName("Discount").HasColumnType("decimal(18,2)");
             builder.Property(x => x.TotalItem).HasColumnName("TotalItem").HasColumnType("int").IsRequired();

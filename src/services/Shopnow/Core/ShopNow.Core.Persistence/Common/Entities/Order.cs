@@ -8,7 +8,7 @@ namespace ShopNow.Core.Persistence.Common.Entities
         public string Status { get; set; }
         public int TotalItem { get; set; }
         public decimal SubTotal { get; set; }
-        public string Coupon { get; set; }
+        public string? Coupon { get; set; }
         public decimal Discount { get; set; }
 
         public ICollection<OrderProductMapping> OrderProducts { get; set; } = new List<OrderProductMapping>();

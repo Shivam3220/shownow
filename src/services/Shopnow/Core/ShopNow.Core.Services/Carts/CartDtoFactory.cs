@@ -12,6 +12,7 @@ namespace ShopNow.Core.Services.Carts
                 CartUid = cart.Uid,
                 Status = cart.Status,
                 SubTotal = cart.SubTotal,
+                TotalItem = cart.TotalItem,
                 Discount = cart.Discount,
                 Coupon = cart.Coupon,
                 Items = cart.CartProducts.Select(cp => new CartItemDto

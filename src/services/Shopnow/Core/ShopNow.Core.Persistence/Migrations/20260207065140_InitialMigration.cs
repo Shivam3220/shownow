@@ -47,7 +47,7 @@ namespace ShopNow.Core.Persistence.Migrations
                     Status = table.Column<string>(type: "nvarchar(50)", nullable: false),
                     TotalItem = table.Column<int>(type: "int", nullable: false),
                     SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Coupon = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    Coupon = table.Column<string>(type: "nvarchar(50)", nullable: true),
                     Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Uid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)

@@ -19,7 +19,7 @@ namespace ShopNow.Core.Persistence.Common.Repositories.Carts
             {
                 Cart? cart = await shopDbContext.Set<Cart>()
                                                 .AsNoTracking()
-                                                .Where(x => x.UserFk == productId)
+                                                .Where(x => x.UserFk == productId && x.Status == "ACTIVE")
                                                 .FirstOrDefaultAsync();
                 if (cart is null)
                 {
