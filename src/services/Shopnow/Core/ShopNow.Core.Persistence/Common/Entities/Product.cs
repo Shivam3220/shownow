@@ -9,5 +9,7 @@ namespace ShopNow.Core.Persistence.Common.Entities
         public string? Image { get; set; }
         public Decimal Price { get; set; }
         public int Stock { get; set; }
+
+        public ICollection<CartProductMapping> CartProducts { get; set; }
     }
 }

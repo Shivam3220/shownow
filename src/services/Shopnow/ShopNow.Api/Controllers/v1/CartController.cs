@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ShopNow.Core.Contracts.Dtos.Carts;
 using ShopNow.Core.Contracts.Dtos.Users;
 using ShopNow.Core.Contracts.Results;
 using ShopNow.Core.Persistence.Common.Entities;
@@ -13,11 +14,11 @@ namespace ShopNow.Api.Controllers
     [Route("api/v1/[controller]")]
     public class CartController(ICartService cartService) : BaseController
     {
-        [HttpPost("user/{userId}/cart")]
+        [HttpGet("user/{userId}/cart")]
         public async Task<IActionResult> GetActiveCart(Guid userId)
         {
 
-            Result<Cart> cart = await cartService.GetCartByUserIdAsync(userId: userId);
+            Result<CartDto> cart = await cartService.GetCartByUserIdAsync(userId: userId);
 
             return OkOrError(cart);
         }
@@ -26,17 +27,35 @@ namespace ShopNow.Api.Controllers
         public async Task<IActionResult> CreateNewCart(Guid userId)
         {
 
-            Result<Cart> cart = await cartService.CreateNewCart(userId: userId);
+            Result<CartDto> cart = await cartService.CreateNewCart(userId: userId);
 
             return OkOrError(cart);
         }
 
 
-        [HttpGet("cart/{cartId}/apply-coupon")]
+        [HttpPost("{cartId}/apply-coupon")]
+        public async Task<IActionResult> ApplyCouponByCartIdAsync(Guid cartId)
+        {
+
+            Result<CartDto> cart = await cartService.ApplyCoupon(cartUid: cartId);
+
+            return OkOrError(cart);
+        }
+
+        [HttpGet("{cartId}/")]
         public async Task<IActionResult> GetCartByUidAsync(Guid cartId)
         {
 
-            Result<Cart> cart = await cartService.ApplyCoupon(cartUid: cartId);
+            Result<CartDto> cart = await cartService.GetCartByIdAsync(cartId: cartId);
+
+            return OkOrError(cart);
+        }
+
+        [HttpPost("item")]
+        public async Task<IActionResult> AddUpdateCartAsync(UpdateItemToCart request)
+        {
+
+            Result<CartDto> cart = await cartService.UpdateCart(request.CartUid, request.ProductUid, request.Quantity);
 
             return OkOrError(cart);
         }

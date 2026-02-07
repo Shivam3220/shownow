@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ShopNow.Core.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,7 +25,7 @@ namespace ShopNow.Core.Persistence.Migrations
                     Status = table.Column<string>(type: "nvarchar(50)", nullable: false),
                     TotalItem = table.Column<int>(type: "int", nullable: false),
                     SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Coupon = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    Coupon = table.Column<string>(type: "nvarchar(50)", nullable: true),
                     Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Uid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -33,25 +33,7 @@ namespace ShopNow.Core.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cart", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CartProductMapping",
-                schema: "Shopnow",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CartFk = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductFk = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TotalItem = table.Column<int>(type: "int", nullable: false),
-                    SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Uid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CartProductMapping", x => x.Id);
+                    table.UniqueConstraint("AK_Cart_Uid", x => x.Uid);
                 });
 
             migrationBuilder.CreateTable(
@@ -112,6 +94,7 @@ namespace ShopNow.Core.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Product", x => x.Id);
+                    table.UniqueConstraint("AK_Product_Uid", x => x.Uid);
                 });
 
             migrationBuilder.CreateTable(
@@ -131,15 +114,63 @@ namespace ShopNow.Core.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_User", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "CartProductMapping",
+                schema: "Shopnow",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CartFk = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductFk = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TotalItem = table.Column<int>(type: "int", nullable: false),
+                    SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Uid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CartProductMapping", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CartProductMapping_Cart_CartFk",
+                        column: x => x.CartFk,
+                        principalSchema: "Shopnow",
+                        principalTable: "Cart",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CartProductMapping_Product_ProductFk",
+                        column: x => x.ProductFk,
+                        principalSchema: "Shopnow",
+                        principalTable: "Product",
+                        principalColumn: "Uid",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartProductMapping_CartFk",
+                schema: "Shopnow",
+                table: "CartProductMapping",
+                column: "CartFk");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartProductMapping_ProductFk",
+                schema: "Shopnow",
+                table: "CartProductMapping",
+                column: "ProductFk");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Email",
+                schema: "Shopnow",
+                table: "User",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Cart",
-                schema: "Shopnow");
-
             migrationBuilder.DropTable(
                 name: "CartProductMapping",
                 schema: "Shopnow");
@@ -153,11 +184,15 @@ namespace ShopNow.Core.Persistence.Migrations
                 schema: "Shopnow");
 
             migrationBuilder.DropTable(
-                name: "Product",
+                name: "User",
                 schema: "Shopnow");
 
             migrationBuilder.DropTable(
-                name: "User",
+                name: "Cart",
+                schema: "Shopnow");
+
+            migrationBuilder.DropTable(
+                name: "Product",
                 schema: "Shopnow");
         }
     }

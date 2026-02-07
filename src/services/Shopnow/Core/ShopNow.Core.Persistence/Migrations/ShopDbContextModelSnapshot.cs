@@ -31,7 +31,6 @@ namespace ShopNow.Core.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Coupon")
-                        .IsRequired()
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("Coupon");
 
@@ -102,6 +101,10 @@ namespace ShopNow.Core.Persistence.Migrations
                         .HasColumnName("Uid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CartFk");
+
+                    b.HasIndex("ProductFk");
 
                     b.ToTable("CartProductMapping", "Shopnow");
                 });
@@ -266,7 +269,41 @@ namespace ShopNow.Core.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.ToTable("User", "Shopnow");
+                });
+
+            modelBuilder.Entity("ShopNow.Core.Persistence.Common.Entities.CartProductMapping", b =>
+                {
+                    b.HasOne("ShopNow.Core.Persistence.Common.Entities.Cart", "Cart")
+                        .WithMany("CartProducts")
+                        .HasForeignKey("CartFk")
+                        .HasPrincipalKey("Uid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShopNow.Core.Persistence.Common.Entities.Product", "Product")
+                        .WithMany("CartProducts")
+                        .HasForeignKey("ProductFk")
+                        .HasPrincipalKey("Uid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ShopNow.Core.Persistence.Common.Entities.Cart", b =>
+                {
+                    b.Navigation("CartProducts");
+                });
+
+            modelBuilder.Entity("ShopNow.Core.Persistence.Common.Entities.Product", b =>
+                {
+                    b.Navigation("CartProducts");
                 });
 #pragma warning restore 612, 618
         }

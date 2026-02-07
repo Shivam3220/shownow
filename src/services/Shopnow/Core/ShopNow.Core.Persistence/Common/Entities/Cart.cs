@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 
 namespace ShopNow.Core.Persistence.Common.Entities
 {
@@ -12,6 +13,8 @@ namespace ShopNow.Core.Persistence.Common.Entities
         public decimal SubTotal { get; set; }
         public string? Coupon { get; set; }
         public decimal Discount { get; set; }
+
+        public ICollection<CartProductMapping> CartProducts { get; set; } = new List<CartProductMapping>();
 
         public void ApplyCoupon(string couponName, decimal discountAmount)
         {

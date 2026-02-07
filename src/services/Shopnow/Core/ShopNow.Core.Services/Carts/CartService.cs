@@ -1,12 +1,14 @@
+using ShopNow.Core.Contracts.Dtos.Carts;
 using ShopNow.Core.Contracts.Results;
 using ShopNow.Core.Persistence.Common.Entities;
 using ShopNow.Core.Persistence.Common.Repositories.Carts;
+using ShopNow.Core.Persistence.Common.Repositories.Products;
 using ShopNow.Core.Persistence.Common.Repositories.UnitOfWork;
 using ShopNow.Core.Persistence.Common.Repositories.Users;
 
 namespace ShopNow.Core.Services.Carts
 {
-    public class CartService(ICartRepository cartRepository, IUnitOfWork unitOfWork, IUserRepository userRepository) : ICartService
+    public class CartService(ICartRepository cartRepository, IProductRepository productRepository, IUnitOfWork unitOfWork, IUserRepository userRepository) : ICartService
     {
         Dictionary<string, int> AvailableCoupon = new Dictionary<string, int>
         {
@@ -14,14 +16,14 @@ namespace ShopNow.Core.Services.Carts
             { "SAVE10", 10 },
         };
 
-        public async Task<Result<Cart>> ApplyCoupon(Guid cartUid)
+        public async Task<Result<CartDto>> ApplyCoupon(Guid cartUid)
         {
             try
             {
                 Result<Cart> cart = await cartRepository.GetCartByIdAsync(cartUid);
                 if (cart.IsFailure)
                 {
-                    return Result.FromError<Cart>(cart);
+                    return Result.FromError<CartDto>(cart);
                 }
 
                 if (cart.Value.SubTotal > 1000)
@@ -45,27 +47,27 @@ namespace ShopNow.Core.Services.Carts
 
                 if (result.IsFailure)
                 {
-                    return Result.FromError<Cart>(result);
+                    return Result.FromError<CartDto>(result);
                 }
 
-                return Result.Ok(cart.Value);
+                return Result.Ok(cart.Value.ToCartDto());
             }
             catch
             {
-                return Result.Failure<Cart>("Failed To Process request");
+                return Result.Failure<CartDto>("Failed To Process request");
             }
         }
 
-        public async Task<Result<Cart>> CreateNewCart(Guid userId)
+        public async Task<Result<CartDto>> CreateNewCart(Guid userId)
         {
             Result<User> user = await userRepository.GetByUserIdAsyncAsync(userId);
 
             if (user.IsFailure)
             {
-                return Result.Failure<Cart>("Invalid user id");
+                return Result.Failure<CartDto>("Invalid user id");
             }
 
-            Result<Cart> existingCart = await GetCartByUserIdAsync(userId);
+            Result<CartDto> existingCart = await GetCartByUserIdAsync(userId);
 
             if (existingCart.IsFailure && !existingCart.IsNotFound)
             {
@@ -74,7 +76,7 @@ namespace ShopNow.Core.Services.Carts
 
             if (existingCart.IsSuccess)
             {
-                return Result.Conflict<Cart>("User already have a active cart");
+                return Result.Conflict<CartDto>("User already have a active cart");
             }
 
             Cart newCart = Cart.CreateNew(userFk: userId);
@@ -83,21 +85,85 @@ namespace ShopNow.Core.Services.Carts
 
             if (result.IsFailure)
             {
-                return Result.FromError<Cart>(result);
+                return Result.FromError<CartDto>(result);
             }
 
-            return Result.Ok(newCart);
+            return Result.Ok(newCart.ToCartDto());
         }
 
-        public async Task<Result<Cart>> GetCartByIdAsync(Guid cartId)
+        public async Task<Result<CartDto>> GetCartByIdAsync(Guid cartId)
         {
-            return await cartRepository.GetCartByIdAsync(cartId);
+            Result<Cart> cart = await cartRepository.GetCartByIdAsync(cartId, true);
+            if (cart.IsFailure)
+            {
+                return Result.FromError<CartDto>(cart);
+            }
+            return Result.Ok(cart.Value.ToCartDto());
 
         }
 
-        public async Task<Result<Cart>> GetCartByUserIdAsync(Guid userId)
+        public async Task<Result<CartDto>> GetCartByUserIdAsync(Guid userId)
         {
-            return await cartRepository.GetCartByUserIdAsync(userId);
+            Result<Cart> cart = await cartRepository.GetCartByUserIdAsync(userId);
+            if (cart.IsFailure)
+            {
+                return Result.FromError<CartDto>(cart);
+            }
+            return Result.Ok(cart.Value.ToCartDto());
+        }
+
+        public async Task<Result<CartDto>> UpdateCart(Guid cartId, Guid productId, int quantity)
+        {
+            Result<Product> product = await productRepository.GetProductByIdAsync(productId);
+
+            if (product.IsFailure)
+            {
+                return Result.FromError<CartDto>(product);
+            }
+
+            if (product.Value.Stock < quantity)
+            {
+                return Result.Conflict<CartDto>($"Only {product.Value.Stock} left");
+            }
+
+            Result<Cart> cart = await cartRepository.GetCartByIdAsync(cartId);
+
+            if (cart.IsFailure)
+            {
+                return Result.FromError<CartDto>(cart);
+            }
+
+            var existingItem = cart.Value.CartProducts?
+                        .FirstOrDefault(cp => cp.ProductFk == productId);
+
+            if (existingItem != null)
+            {
+                existingItem.Quantity = quantity;
+                existingItem.PurchasePrice = product.Value.Price;
+            }
+
+            if (existingItem == null)
+            {
+                var newItem = CartProductMapping.CreateNew(cartId, productId, quantity, product.Value.Price);
+
+                cart.Value.CartProducts.Add(newItem);
+            }
+
+            cart.Value.TotalItem = cart.Value.CartProducts.Sum(x => x.Quantity);
+            cart.Value.SubTotal = cart.Value.CartProducts.Sum(
+                                    x => x.Quantity * x.PurchasePrice
+                                );
+
+            cartRepository.UpdateCart(cart.Value);
+            Result result = await unitOfWork.SaveChangeAsync();
+
+            if (result.IsFailure)
+            {
+                return Result.FromError<CartDto>(result);
+            }
+
+            return Result.Ok(cart.Value.ToCartDto());
+
         }
     }
 }

@@ -13,37 +13,44 @@ namespace ShopNow.Core.Persistence.Common.Repositories.Carts
             shopDbContext.Set<Cart>().Add(cart);
         }
 
-        public async Task<Result<Cart>> GetCartByIdAsync(Guid productId)
+        public async Task<Result<Cart>> GetCartByUserIdAsync(Guid productId)
         {
             try
             {
                 Cart? cart = await shopDbContext.Set<Cart>()
                                                 .AsNoTracking()
-                                                .Where(x => x.Uid == productId)
+                                                .Where(x => x.UserFk == productId)
                                                 .FirstOrDefaultAsync();
                 if (cart is null)
                 {
                     return Result.NotFound<Cart>("Cart not found");
                 }
-    
+
                 return Result.Ok(cart);
             }
             catch (System.Exception ex)
             {
-                 Console.Write(ex);
+                Console.Write(ex);
                 return Result.Failure<Cart>("Failed to process request at this moment");
             }
         }
 
-        public async Task<Result<Cart>> GetCartByUserIdAsync(Guid userId)
+        public async Task<Result<Cart>> GetCartByIdAsync(Guid userId, bool includeProduct = false)
         {
             try
             {
-                Cart? cart = await shopDbContext.Set<Cart>()
-                                            .AsNoTracking()
-                                            .Where(x => x.UserFk == userId)
-                                            .Where(x => x.Status == "ACTIVE")
-                                            .FirstOrDefaultAsync();
+                IQueryable<Cart> cartQuery = shopDbContext.Set<Cart>()
+                                        .AsNoTracking()
+                                        .Where(x => x.Uid == userId && x.Status == "ACTIVE");
+
+                if (includeProduct)
+                {
+                    cartQuery = cartQuery
+                        .Include(x => x.CartProducts)
+                            .ThenInclude(cp => cp.Product);
+                }
+
+                Cart? cart = await cartQuery.FirstOrDefaultAsync();
                 if (cart is null)
                 {
                     return Result.NotFound<Cart>("Cart not found");

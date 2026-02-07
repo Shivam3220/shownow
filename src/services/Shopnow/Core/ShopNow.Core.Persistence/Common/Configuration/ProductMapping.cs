@@ -19,6 +19,11 @@ namespace ShopNow.Core.Persistence.Common.Configuration
             builder.Property(x => x.Price).HasColumnName("Price").HasColumnType("decimal(18,2)").IsRequired();
             builder.Property(x => x.Stock).HasColumnName("Stock").HasColumnType("int").IsRequired();
             builder.Property(x => x.CreatedOn).HasColumnName("CreatedOn").HasColumnType("datetime2").IsRequired();
+
+            builder.HasMany(p => p.CartProducts)
+                    .WithOne(cp => cp.Product)
+                    .HasForeignKey(cp => cp.ProductFk)
+                    .HasPrincipalKey(p => p.Uid);
         }
     }
 }
