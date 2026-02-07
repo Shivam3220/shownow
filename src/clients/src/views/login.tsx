@@ -76,7 +76,7 @@ const SignIn = ({
 			}
 
 			const data = await res.json();
-      actions.signIn(data.UserUid)
+      actions.signIn(data.uid)
 
 			console.log("Logged in:", data);
 

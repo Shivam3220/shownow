@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
 import { useUserLoginProvider } from "../hooks/context/userContext";
-import { useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { Navbar } from "../components/Navbar";
+import { Orders } from "./Orders";
+import { Cart } from "./Cart";
+import { Products } from "./Products";
 
 export const Home = () => {
 	const { state } = useUserLoginProvider();
@@ -12,5 +16,14 @@ export const Home = () => {
 		}
 	}, [state.isLoggedIn, navigate]);
 
-	return <div>Home</div>;
+	return (
+		<div>
+			<Navbar />
+			<Routes>
+				<Route path="orders" element={<Orders />} />
+				<Route path="cart" element={<Cart />} />
+				<Route path="/" element={<Products />} />
+			</Routes>
+		</div>
+	);
 };

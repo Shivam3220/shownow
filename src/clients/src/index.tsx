@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { UserLoginProvider } from "./hooks/context/userContext";
+import { CartProvider } from "./hooks/context/cartContext";
 
 const root = ReactDOM.createRoot(
 	document.getElementById("root") as HTMLElement,
@@ -11,7 +12,7 @@ const root = ReactDOM.createRoot(
 root.render(
 	<React.StrictMode>
 		<UserLoginProvider initialState={{ isLoggedIn: false }}>
-			<App />
+				<App />
 		</UserLoginProvider>
 	</React.StrictMode>,
 );

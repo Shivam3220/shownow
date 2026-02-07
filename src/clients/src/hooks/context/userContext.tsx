@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type InitialUserStateType = {
 	state: {
@@ -30,11 +30,25 @@ export const UserLoginProvider = ({
 	const [state, setState] =
 		useState<InitialUserStateType["state"]>(initialState);
 
+	useEffect(() => {
+		if(window)
+		{
+			const userId = window.localStorage.getItem("user")
+			if(userId)
+			{
+				setState({isLoggedIn: true, userId: userId})
+			}
+		}
+	}, [window])
+	
+
 	const signOut = () => {
+		window.localStorage.removeItem("user")
         setState({isLoggedIn: false, userId: null})
     }
 
 	const signIn = (userId: string) => {
+		window.localStorage.setItem("user", userId)
         setState({isLoggedIn: true, userId: userId})
     }
 
