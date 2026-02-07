@@ -24,4 +24,23 @@ namespace ShopNow.Core.Contracts.Dtos.Carts
         public int Quantity { get; set; }
     }
 
+    public class OrderDto
+    {
+        public Guid OrderUid { get; set; }
+        public string Status { get; set; }
+        public int TotalItem { get; set; }
+        public decimal SubTotal { get; set; }
+        public string? Coupon { get; set; }
+        public decimal Discount { get; set; }
+        public List<OrderItemDto> Items { get; set; }
+    }
+
+    public class OrderItemDto
+    {
+        public Guid ProductUid { get; set; }
+        public string ProductName { get; set; }
+        public decimal Price { get; set; }
+        public int Quantity { get; set; }
+    }
+
 }

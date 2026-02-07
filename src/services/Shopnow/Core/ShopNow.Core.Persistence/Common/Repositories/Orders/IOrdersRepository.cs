@@ -6,6 +6,6 @@ namespace ShopNow.Core.Persistence.Common.Repositories.Orders
     public interface IOrdersRepository
     {
         Task<Result<Order>> GetOrderByIdAsync(Guid orderId);
-        Task<Result<List<Order>>> GetAllOrdersAsync();
+        Task<Result<List<Order>>> GetAllOrdersAsync(Guid userId);
     }
 }

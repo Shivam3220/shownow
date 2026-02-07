@@ -24,6 +24,11 @@ namespace ShopNow.Core.Persistence.Common.Configuration
                     .WithOne(cp => cp.Product)
                     .HasForeignKey(cp => cp.ProductFk)
                     .HasPrincipalKey(p => p.Uid);
+
+            builder.HasMany(p => p.OrderProducts)
+                    .WithOne(cp => cp.Product)
+                    .HasForeignKey(cp => cp.ProductFk)
+                    .HasPrincipalKey(p => p.Uid);
         }
     }
 }

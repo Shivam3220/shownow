@@ -1,8 +1,10 @@
 using ShopNow.Core.Persistence.Common.Repositories.Carts;
+using ShopNow.Core.Persistence.Common.Repositories.Orders;
 using ShopNow.Core.Persistence.Common.Repositories.Products;
 using ShopNow.Core.Persistence.Common.Repositories.UnitOfWork;
 using ShopNow.Core.Persistence.Common.Repositories.Users;
 using ShopNow.Core.Services.Carts;
+using ShopNow.Core.Services.Orders;
 using ShopNow.Core.Services.Products;
 using ShopNow.Core.Services.Users;
 
@@ -16,10 +18,12 @@ namespace ShopNow.Api.Registers
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICartRepository, CartRepository>();
+            services.AddScoped<IOrdersRepository, OrdersRepository>();
 
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICartService, CartService>();
+            services.AddScoped<IOrdersServices, OrdersServices>();
 
             return services;
         }

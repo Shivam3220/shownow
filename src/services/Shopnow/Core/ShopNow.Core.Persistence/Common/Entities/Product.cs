@@ -11,5 +11,6 @@ namespace ShopNow.Core.Persistence.Common.Entities
         public int Stock { get; set; }
 
         public ICollection<CartProductMapping> CartProducts { get; set; }
+        public ICollection<OrderProductMapping> OrderProducts { get; set; }
     }
 }
