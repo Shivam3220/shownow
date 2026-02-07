@@ -166,6 +166,19 @@ namespace ShopNow.Core.Persistence.Migrations
                 table: "User",
                 column: "Email",
                 unique: true);
+
+
+            migrationBuilder.InsertData(
+        schema: "Shopnow",
+        table: "Product",
+        columns: new[] { "Uid", "Name", "Description", "Image", "Price", "Stock", "CreatedOn" },
+        values: new object[,]
+        {
+            { Guid.NewGuid(), "Laptop", "High performance laptop", "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", 1200.00m, 10, DateTime.UtcNow },
+            { Guid.NewGuid(), "Smartphone", "Latest model smartphone", "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", 800.00m, 20, DateTime.UtcNow },
+            { Guid.NewGuid(), "Headphones", "Noise cancelling headphones", "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", 150.00m, 50, DateTime.UtcNow }
+        }
+    );
         }
 
         /// <inheritdoc />

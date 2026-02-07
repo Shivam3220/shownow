@@ -34,12 +34,25 @@ public class Program
             .RegisterServices()
             .RegisterControllers();
 
+        builder.Services.AddCors(options =>
+{
+options.AddPolicy("AllowAll", policy =>
+{
+    policy
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+});
+});
+
         return builder.Build();
     }
 
     private static void RunApplication(WebApplication app)
     {
         MigrationManager.MigrateDatabase(app.Services);
+        app.UseCors("AllowAll");
+
         app
             .UseRouting()
             .UseSwagger()
@@ -48,7 +61,6 @@ public class Program
             {
                 endpoints.MapControllers();
             });
-
         app.Run();
     }
 }
